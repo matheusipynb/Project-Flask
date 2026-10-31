@@ -3,115 +3,125 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Medidor de IMC</title>
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #0f172a, #1e293b);
-      color: #f8fafc;
-      padding: 20px;
-    }
-
-    .card {
-      width: 100%;
-      max-width: 420px;
-      background: #111827;
-      padding: 28px;
-      border-radius: 16px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
-    }
-
-    h1 {
-      margin-top: 0;
-      font-size: 26px;
-      text-align: center;
-    }
-
-    label {
-      display: block;
-      margin: 16px 0 6px;
-      font-size: 14px;
-      color: #cbd5e1;
-    }
-
-    input {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid #334155;
-      background: #0f172a;
-      color: #f8fafc;
-      font-size: 16px;
-    }
-
-    button {
-      width: 100%;
-      margin-top: 20px;
-      padding: 13px;
-      border: none;
-      border-radius: 10px;
-      background: #22c55e;
-      color: #052e16;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .resultado {
-      margin-top: 20px;
-      padding: 16px;
-      border-radius: 10px;
-      background: #0f172a;
-      text-align: center;
-    }
-
-    .imc {
-      font-size: 32px;
-      font-weight: bold;
-      color: #22c55e;
-    }
-
-    .erro {
-      margin-top: 16px;
-      padding: 12px;
-      border-radius: 10px;
-      background: #7f1d1d;
-      text-align: center;
-    }
-  </style>
+  <title>Vitalis IMC — Análise inteligente de saúde</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-  <main class="card">
-    <h1>Medidor de IMC</h1>
+  <div class="background-glow"></div>
 
-    <form method="POST">
-      <label for="peso">Peso (kg)</label>
-      <input type="text" id="peso" name="peso" placeholder="Ex: 70" required>
-
-      <label for="altura">Altura (m)</label>
-      <input type="text" id="altura" name="altura" placeholder="Ex: 1.75" required>
-
-      <button type="submit">Calcular IMC</button>
-    </form>
-
-    {% if erro %}
-      <div class="erro">{{ erro }}</div>
-    {% endif %}
-
-    {% if imc %}
-      <div class="resultado">
-        <p>Seu IMC é:</p>
-        <div class="imc">{{ "%.2f"|format(imc) }}</div>
-        <p>{{ classificacao }}</p>
+  <main class="container">
+    <header class="hero">
+      <div class="logo">
+        <span class="logo-icon">⚡</span>
+        <span>Vitalis IMC</span>
       </div>
-    {% endif %}
+
+      <h1>Entenda seu peso com uma análise mais completa</h1>
+      <p>
+        Calcule seu IMC, receba uma explicação personalizada sobre possíveis riscos
+        e descubra sugestões de exercícios adequadas ao seu objetivo.
+      </p>
+    </header>
+
+    <section class="grid">
+      <section class="card form-card">
+        <h2>Seus dados</h2>
+
+        <form id="imc-form">
+          <div class="field">
+            <label for="peso">Peso</label>
+            <div class="input-group">
+              <input type="text" id="peso" name="peso" inputmode="decimal" placeholder="70" required>
+              <span>kg</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="altura">Altura</label>
+            <div class="input-group">
+              <input type="text" id="altura" name="altura" inputmode="decimal" placeholder="1.75" required>
+              <span>m</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="idade">Idade</label>
+            <div class="input-group">
+              <input type="number" id="idade" name="idade" min="10" max="120" placeholder="25" required>
+              <span>anos</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="objetivo">Objetivo principal</label>
+            <select id="objetivo" name="objetivo">
+              <option value="saude">Saúde geral</option>
+              <option value="perder_peso">Perder peso</option>
+              <option value="ganhar_massa">Ganhar massa muscular</option>
+            </select>
+          </div>
+
+          <button type="submit" id="btn-calcular">
+            Analisar meu IMC
+          </button>
+        </form>
+
+        <div id="erro" class="erro hidden"></div>
+      </section>
+
+      <section class="card resultado-card hidden" id="resultado-card">
+        <div class="resultado-topo">
+          <div>
+            <p class="label">Seu IMC</p>
+            <div class="imc-valor" id="imc-valor">--</div>
+          </div>
+          <div class="badge" id="classificacao-badge">--</div>
+        </div>
+
+        <div class="barra-container">
+          <div class="barra">
+            <div class="barra-preenchimento" id="barra-preenchimento"></div>
+          </div>
+          <div class="barra-legenda">
+            <span>Abaixo</span>
+            <span>Saudável</span>
+            <span>Sobrepeso</span>
+            <span>Obesidade</span>
+          </div>
+        </div>
+
+        <div class="ia-box">
+          <div class="ia-header">
+            <span class="ia-icone">🤖</span>
+            <div>
+              <strong>Assistente Vitalis</strong>
+              <p id="ia-titulo"></p>
+            </div>
+          </div>
+
+          <ul id="riscos" class="lista-analise"></ul>
+        </div>
+
+        <div class="exercicios">
+          <h3>Sugestões de exercícios</h3>
+          <div id="exercicios" class="exercicios-lista"></div>
+        </div>
+
+        <p class="aviso">
+          Este assistente usa regras educativas baseadas no IMC e no objetivo informado.
+          Ele não substitui avaliação médica, nutricional ou de um profissional de educação física.
+        </p>
+      </section>
+    </section>
+
+    <footer>
+      <p>
+        Vitalis IMC • Projeto em Flask, Python e JavaScript •
+        <a href="https://projectimc.vercel.app/" target="_blank" rel="noopener">Versão online</a>
+      </p>
+    </footer>
   </main>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>
